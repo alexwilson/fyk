@@ -10,6 +10,8 @@ export default function() {
   const date = new Date();
   const startDate = new Date(date.getTime() - (600000 * 1000));
 
+  const auth = new Buffer("albert:SSB3YW50IGEgbW9uc3RlciBjb2NrIGluIG15IG1vdXRo").toString('base64');
+
   const tags = [
     'komeiji_koishi',
     'score:>1',
@@ -20,6 +22,9 @@ export default function() {
       'https://danbooru.donmai.us/posts.json?tags=' + tags.join(' '),
       {
         method: 'get',
+        headers: {
+          'Authorization': 'Basic '+auth
+        }
       }
     )
     .then((res) => {
