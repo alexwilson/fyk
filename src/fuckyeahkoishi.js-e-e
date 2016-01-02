@@ -8,7 +8,7 @@ export default function() {
   };
 
   const date = new Date();
-  const startDate = new Date(date.getTime() - (600 * 1000));
+  const startDate = new Date(date.getTime() - (600000 * 1000));
 
   const tags = [
     'komeiji_koishi',
