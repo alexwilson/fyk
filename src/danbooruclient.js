@@ -67,7 +67,7 @@ const DanbooruClient = {
     console.log('Searching for tags - ' + tags);
 
     const danbooruAddress = 'https://danbooru.donmai.us'
-    const queryAddress = danbooruAddress + '/posts.json?limit=1&tags=' + tags.join(' ');
+    const queryAddress = danbooruAddress + '/posts.json?tags=' + tags.join(' ');
 
     return new Promise((resolve, reject) => {
 
