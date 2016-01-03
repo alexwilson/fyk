@@ -1,2 +1,2 @@
 require('babel-core/register');
-require('./src/fuckyeahkoishi.js').default();
+require('./src/main.js').default();

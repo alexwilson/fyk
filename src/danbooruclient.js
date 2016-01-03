@@ -29,9 +29,9 @@ const DanbooruClient = {
   },
 
   /**
-   * @param  {[type]}   err      [description]
-   * @param  {Function} callback [description]
-   * @return {[type]}            [description]
+   * @param  {err}      err
+   * @param  {Function} callback
+   * @return {void}
    */
   fetchPosts: (err, callback) => {
 
