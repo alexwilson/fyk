@@ -13,7 +13,14 @@ const DanbooruClient = {
   endDate: new Date(),
 
   /**
+   * Tags to search for.
+   * @type {Array}
+   */
+  tags: [],
+
+  /**
    * @param {Date}
+   * @returns {DanbooruClient}
    */
   setStartDate: (startDate) => {
     DanbooruClient.startDate = startDate;
@@ -22,9 +29,19 @@ const DanbooruClient = {
 
   /**
    * @param {Date} endDate 
+   * @returns {DanbooruClient}
    */
   setEndDate: (endDate) => {
     DanbooruClient.endDate = endDate;
+    return DanbooruClient;
+  },
+
+  /**
+   * @param {string} A tag to search for.
+   * @returns {DanbooruClient}
+   */
+  addTag: (tag) => {
+    DanbooruClient.tags.push(tag);
     return DanbooruClient;
   },
 
@@ -41,19 +58,21 @@ const DanbooruClient = {
       auth = new Buffer(process.env.DANBOORU_USER+':'+process.env.DANBOORU_KEY).toString('base64');
     }
 
-    const tags = [
-      'komeiji_koishi',
-      'date:'+DanbooruClient.startDate.toISOString()+'..'+DanbooruClient.endDate.toISOString()
-    ];
+    const tags = DanbooruClient.tags;
+
+    if (DanbooruClient.startDate && DanbooruClient.endDate) {
+      tags.push('date:'+DanbooruClient.startDate.toISOString()+'..'+DanbooruClient.endDate.toISOString());
+    }
 
     console.log('Searching for tags - ' + tags);
 
-    const danbooruAddress = 'https://danbooru.donmai.us/posts.json?tags=' + tags.join(' ');
+    const danbooruAddress = 'https://danbooru.donmai.us'
+    const queryAddress = danbooruAddress + '/posts.json?limit=1&tags=' + tags.join(' ');
 
     return new Promise((resolve, reject) => {
 
       fetch(
-          danbooruAddress,
+          queryAddress,
           {
             method: 'get',
             headers: {
@@ -65,8 +84,21 @@ const DanbooruClient = {
           return res.json();
         })
         .then((res) => {
+          // Add original danbooru addresses.
+          return res.map((item) => {
+            item.post_url = danbooruAddress + '/posts/' + item.id;
+            item.file_url = danbooruAddress + item.file_url;
+            item.large_file_url = danbooruAddress + item.large_file_url;
+            item.preview_file_url = danbooruAddress + item.preview_file_url;
+            return item;
+          });
+        })
+        .then((res) => {
           console.log('Found ' + res.length + ' new results.');
           resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
         })
       ;
 

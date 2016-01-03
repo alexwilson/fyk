@@ -22,11 +22,10 @@ export default () => {
     danbooruClient
       .setStartDate(startDate)
       .setEndDate(endDate)
+      .addTag('komeiji_koishi')
       .fetchPosts()
       .then((res) => {
-        return res;
-      })
-      .then((res) => {
+        // Finally, post something to Tumblr!
         tumblrClient.postImages(res);
       })
       .catch((err) => {
