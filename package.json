@@ -6,7 +6,7 @@
   "scripts": {
     "start": "exit 0",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "update": "node index.js"
+    "update": "./index.js"
   },
   "author": "Alex Wilson <a@ax.gy>",
   "license": "ISC",

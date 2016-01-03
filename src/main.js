@@ -11,18 +11,28 @@ export default () => {
   const endDate = new Date();
 
   bluebird.promisifyAll(redis);
-  bluebird.promisifyAll(danbooruClient);
 
+  /**
+   * Handles retrieving matching Danbooru posts.
+   * @param  {Date}  startDate
+   * @param  {Date}  endDate
+   * @return {void}
+   */
   function fetchDanbooruPosts(startDate, endDate) {
     danbooruClient
       .setStartDate(startDate)
       .setEndDate(endDate)
-      .fetchPostsAsync()
+      .fetchPosts()
       .then((res) => {
-        console.log('aaa');
-        console.log(res);
+        return res;
       })
-    ; 
+      .then((res) => {
+        tumblrClient.postImages(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+    ;
   }
 
   // Do we have persistence?
@@ -51,6 +61,5 @@ export default () => {
     startDate.setTime(endDate.getTime() - (600 * 1000));
     fetchDanbooruPosts(startDate, endDate);
   }
-
 
 };

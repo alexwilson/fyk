@@ -31,9 +31,9 @@ const DanbooruClient = {
   /**
    * @param  {err}      err
    * @param  {Function} callback
-   * @return {void}
+   * @return {Promise}
    */
-  fetchPosts: (err, callback) => {
+  fetchPosts: () => {
 
     let auth = '';
     if (process.env.DANBOORU_USER && process.env.DANBOORU_KEY) {
@@ -50,26 +50,27 @@ const DanbooruClient = {
 
     const danbooruAddress = 'https://danbooru.donmai.us/posts.json?tags=' + tags.join(' ');
 
-    fetch(
-        danbooruAddress,
-        {
-          method: 'get',
-          headers: {
-            'Authorization': 'Basic '+auth
+    return new Promise((resolve, reject) => {
+
+      fetch(
+          danbooruAddress,
+          {
+            method: 'get',
+            headers: {
+              'Authorization': 'Basic '+auth
+            }
           }
-        }
-      )
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        console.log('Found ' + res.length + ' new results.');
-        callback(res);
-      })
-      .catch((res) => {
-        throw res;
-      })
-    ;
+        )
+        .then((res) => {
+          return res.json();
+        })
+        .then((res) => {
+          console.log('Found ' + res.length + ' new results.');
+          resolve(res);
+        })
+      ;
+
+    });
   }
 
 };
