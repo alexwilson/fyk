@@ -36,7 +36,6 @@ export default function() {
 
   const tags = [
     'komeiji_koishi',
-    'score:>1',
     'date:'+startDate.toISOString()+'..'+date.toISOString()
   ];
 
