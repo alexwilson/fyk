@@ -1,6 +1,6 @@
-import * as tumblr from "tumblr";
 import fetch from "node-fetch";
 import redis from "redis";
+import tumblrClient from "./tumblrclient.js"
 
 export default function() {
 
