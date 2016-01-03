@@ -1,59 +1,59 @@
-import fetch from "node-fetch";
 import redis from "redis";
-import tumblrClient from "./tumblrclient.js"
+import bluebird from "bluebird";
+import danbooruClient from "./danbooruclient.js";
+import tumblrClient from "./tumblrclient.js";
 
-export default function() {
+export default () => {
 
   console.log('Starting FuckYeahKoishi');
 
-  let auth = '';
-  if (process.env.DANBOORU_USER && process.env.DANBOORU_KEY) {
-    console.log('Danbooru credentials found.');
-    auth = new Buffer(process.env.DANBOORU_USER+':'+process.env.DANBOORU_KEY).toString('base64');
-  }
+  const startDate = new Date();
+  const endDate = new Date();
 
-  const date = new Date();
-  const startDate = new Date(date.getTime() - (600 * 1000));
+  bluebird.promisifyAll(redis);
+  bluebird.promisifyAll(danbooruClient);
 
   // Do we have persistence?
   if (process.env.REDIS_URL) {
     console.log('Redis found - ' + process.env.REDIS_URL);
+
     const client = redis.createClient(process.env.REDIS_URL);
-    const redisDate = client.get('lastRun', (err, reply) => {
-      console.log('Last run time: ' + reply);
-      return reply;
-    });
-    if (redisDate !== null) {
-      const startDate = redisDate;
-    }
-    client.set('lastRun', date.getTime());
-    client.end();
+    client
+      .getAsync('lastRun')
+      .then((res) => {
+        startDate.setTime(res);
+      })
+      .then((res) => {
+        // Update "last run" to now, so that we may pick up at our next run.
+        return client.set('lastRun', endDate.getTime());
+      })
+      .done((res) => {
+        // Now that we're done, kill the client.
+        danbooruClient
+          .setStartDate(startDate)
+          .setEndDate(endDate)
+          .fetchPostsAsync()
+          .then((res) => {
+            console.log('aaa');
+            console.log(res);
+          })
+        ;
+        client.end();
+      })
+    ;
+
+  } else {
+    console.log('Redis not found');
+    startDate.setTime(endDate.getTime() - (600 * 1000));
+    danbooruClient
+      .setStartDate(startDate)
+      .setEndDate(endDate)
+      .fetchPostsAsync()
+      .then((res) => {
+        console.log(res);
+      })
+    ;
   }
 
-  function repost(item) {
-    console.log("WHEEE", item);
-  };
-
-  const tags = [
-    'komeiji_koishi',
-    'date:'+startDate.toISOString()+'..'+date.toISOString()
-  ];
-
-  fetch(
-      'https://danbooru.donmai.us/posts.json?tags=' + tags.join(' '),
-      {
-        method: 'get',
-        headers: {
-          'Authorization': 'Basic '+auth
-        }
-      }
-    )
-    .then((res) => {
-      return res.json();
-    })
-    .then((res) => {
-      console.log('Found ' + res.length + ' new results.');
-      res.forEach(repost);
-    });
 
 };
