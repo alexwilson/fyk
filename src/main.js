@@ -23,6 +23,7 @@ export default () => {
       .setStartDate(startDate)
       .setEndDate(endDate)
       .addTag('komeiji_koishi')
+      .addTag('rating:safe')
       .fetchPosts()
       .then((res) => {
         // Finally, post something to Tumblr!
