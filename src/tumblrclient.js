@@ -57,12 +57,14 @@ const TumblrClient = {
 
     return new Promise((resolve, reject) => {
 
+      const postState = (process.env.ENV && process.env.ENV == 'dev') ? 'private' : 'post';
+
       TumblrClient
         .getClient()
         .photo(
           process.env.TUMBLR_BLOG_NAME,
           {
-            'state': 'post',
+            'state': postState,
             'caption': 'Source: <a href="'+image.post_url+'">'+image.post_url+'</a>',
             'link': image.post_url,
             'source': image.file_url,
